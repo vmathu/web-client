@@ -40,16 +40,16 @@ def download_content_length(headers, BUFSIZE, data, s, file_name):
         except OSError:
             break
         else:
+            file += data
             if l_content <= 0:
                 break
-            file += data
 
     # Look for the end of the header
     pos = file.find(b"\r\n\r\n")
 
     # Skip past the header and save file data
     file = file[pos+4:]
-    fwrite = open(file_name, "wb")
+    fwrite = open(file_name, "wb+")
     fwrite.write(file)
     fwrite.close()
 
@@ -159,6 +159,7 @@ if DOWNLOAD_TYPE == "":
     stri = f"GET {request} HTTP/1.1\r\nHost: {HOST}\r\n\r\n"
     s.send(bytes(stri, "utf8"))
 
+    data=b""
     data = s.recv(BUFSIZE)
 
     if data:
