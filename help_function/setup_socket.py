@@ -2,7 +2,6 @@ import socket
 import urllib.parse
 
 def create_socket(URL):
-    #print(URL)
     s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     o = urllib.parse.urlsplit(URL)
     HOST = o.netloc

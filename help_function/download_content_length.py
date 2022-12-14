@@ -88,7 +88,6 @@ def download_folder(links, s, BUFSIZE, HOST):
         if not os.path.exists(dir):
             os.mkdir(dir)
         file_name = link.split('/')[-1]
-        file_name.replace("%20", " ")
         path = os.path.join(dir, file_name)
 
         stri = f"GET {urllib.parse.urlsplit(link).path} HTTP/1.1\r\nHost: {HOST}\r\n\r\n"
