@@ -50,7 +50,7 @@ def download_content_length(headers, BUFSIZE, data, s, file_name):
     s.close()
 
 #Content-length but for folder
-def download_content_length_folder(headers, BUFSIZE, data, s, file_name, folder_name):
+def download_content_length_folder(headers, BUFSIZE, data, s, path):
     if "Content-Length" in headers:
         l_content = int(headers['Content-Length'])
     else:
@@ -70,8 +70,8 @@ def download_content_length_folder(headers, BUFSIZE, data, s, file_name, folder_
 
     # Skip past the header and save file data
     file = file[pos+4:]
-    file_instruction = folder_name + file_name
-    fwrite = open(file_instruction, "wb+")
+    print(path)
+    fwrite = open(path, "wb+")
     fwrite.write(file)
     fwrite.close()
 
@@ -90,6 +90,6 @@ def download_folder(links, s, BUFSIZE, HOST):
         s.sendall(bytes(stri, "utf-8"))
         data = s.recv(BUFSIZE)
         status, headers = dict_headers(io.StringIO(data.decode(encoding="ISO-8859-1")))
-        download_content_length_folder(headers,BUFSIZE,data,s,file_name,path)
+        download_content_length_folder(headers,BUFSIZE,data,s,path)
 
     s.close()
