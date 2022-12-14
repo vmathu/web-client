@@ -2,7 +2,9 @@ import os
 import io
 import urllib
 
-#get header for content-length
+# get header for content-length
+
+
 def dict_headers(ioheaders: io.StringIO):
     status = ioheaders.readline().strip()
     headers = {}
@@ -17,7 +19,7 @@ def dict_headers(ioheaders: io.StringIO):
     return status, headers
 
 
-#Content-length
+# Content-length
 def download_content_length(headers, BUFSIZE, data, s, file_name):
     if "Content-Length" in headers:
         l_content = int(headers['Content-Length'])
@@ -49,8 +51,10 @@ def download_content_length(headers, BUFSIZE, data, s, file_name):
     fwrite.close()
     s.close()
 
-#Content-length but for folder
-def download_content_length_folder(headers, BUFSIZE, data, s, file_name, folder_name):
+# Content-length but for folder
+
+
+def download_content_length_folder(headers, BUFSIZE, data, s, path):
     if "Content-Length" in headers:
         l_content = int(headers['Content-Length'])
     else:
@@ -61,7 +65,7 @@ def download_content_length_folder(headers, BUFSIZE, data, s, file_name, folder_
         l_content -= len(data)
 
     while (l_content > 0):
-        data = s.recv(min(l_content,BUFSIZE))
+        data = s.recv(min(l_content, BUFSIZE))
         l_content -= len(data)
         file += data
 
@@ -70,28 +74,29 @@ def download_content_length_folder(headers, BUFSIZE, data, s, file_name, folder_
 
     # Skip past the header and save file data
     file = file[pos+4:]
-    file_instruction = folder_name + file_name
-    print(file_instruction)
-    fwrite = open(file_instruction, "wb+")
+    fwrite = open(path, "wb+")
     fwrite.write(file)
     fwrite.close()
 
 # Download folder
+
+
 def download_folder(links, s, BUFSIZE, HOST):
     thread_list = []
     for link in links:
         dir = os.path.join(os.getcwd(), link.split('/')[-2])
         if not os.path.exists(dir):
             os.mkdir(dir)
-        print(dir)
         file_name = link.split('/')[-1]
+        file_name.replace("%20", " ")
         path = os.path.join(dir, file_name)
 
         stri = f"GET {urllib.parse.urlsplit(link).path} HTTP/1.1\r\nHost: {HOST}\r\n\r\n"
 
         s.sendall(bytes(stri, "utf-8"))
         data = s.recv(BUFSIZE)
-        status, headers = dict_headers(io.StringIO(data.decode(encoding="ISO-8859-1")))
-        download_content_length_folder(headers,BUFSIZE,data,s,file_name,path)
+        status, headers = dict_headers(
+            io.StringIO(data.decode(encoding="ISO-8859-1")))
+        download_content_length_folder(headers, BUFSIZE, data, s, path)
 
     s.close()
