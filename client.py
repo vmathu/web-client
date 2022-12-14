@@ -53,31 +53,6 @@ def download_content_length(headers, BUFSIZE, data, s, file_name):
     fwrite.write(file)
     fwrite.close()
 
-def download_content_length_folder(headers, BUFSIZE, data, s, file_name):
-    if "Content-Length" in headers:
-        l_content = int(headers['Content-Length'])
-    else:
-        l_content = len(data)
-    file = b""
-    if data:
-        file = data
-        l_content -= len(data)
-
-    while (l_content > 0):
-        data = s.recv(min(l_content,BUFSIZE))
-        l_content -= len(data)
-        file += data
-
-    # Look for the end of the header
-    pos = file.find(b"\r\n\r\n")
-
-    # Skip past the header and save file data
-    file = file[pos+4:]
-    fwrite = open(file_name, "wb+")
-    fwrite.write(file)
-    fwrite.close()
-
-
 
 # Download type Transfer-Encoding: chunked
 
@@ -140,20 +115,16 @@ def download_folder(links, s, BUFSIZE, HOST):
 
         stri = f"GET {urllib.parse.urlsplit(link).path} HTTP/1.1\r\nHost: {HOST}\r\n\r\n"
 
-        # client_thread = threading.Thread(target=myclient, args=(HOST, 80, stri, path, BUFSIZE))
-        # thread_list.append(client_thread)
-        # client_thread.start()
+        client_thread = threading.Thread(target=myclient, args=(HOST, 80, stri, path, BUFSIZE))
+        thread_list.append(client_thread)
+        client_thread.start()
 
-        s.sendall(bytes(stri, "utf-8"))
-        data = s.recv(BUFSIZE)
-        status, headers = dict_headers(io.StringIO(data.decode(encoding="ISO-8859-1")))
-        download_content_length_folder(headers,BUFSIZE,data,s,file_name)
+        # s.sendall(bytes(stri, "utf-8"))
+        # data = s.recv(BUFSIZE)
+        # if data:
+        #     download_chunked(data, s, BUFSIZE, path)
 
-
-        #  if data:
-        #      download_chunked(data, s, BUFSIZE, path)
-
-   # [x.join() for x in thread_list]
+    [x.join() for x in thread_list]
 
 
 # Main
@@ -183,10 +154,6 @@ else:
     request = URL
 if file_name == "":
     file_name = "index.html"
-
-print(request)
-print(o.path)
-print(file_name)
 
 if DOWNLOAD_TYPE == "":
     stri = f"GET {request} HTTP/1.1\r\nHost: {HOST}\r\n\r\n"

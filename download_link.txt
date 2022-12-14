@@ -1,0 +1,4 @@
+https://www.google.com/
+http://web.stanford.edu/class/cs224w/slides/
+http://example.com/index.html
+http://web.stanford.edu/class/cs143/handouts/

@@ -71,7 +71,6 @@ def download_content_length_folder(headers, BUFSIZE, data, s, file_name, folder_
     # Skip past the header and save file data
     file = file[pos+4:]
     file_instruction = folder_name + file_name
-    print(file_instruction)
     fwrite = open(file_instruction, "wb+")
     fwrite.write(file)
     fwrite.close()
@@ -83,7 +82,6 @@ def download_folder(links, s, BUFSIZE, HOST):
         dir = os.path.join(os.getcwd(), link.split('/')[-2])
         if not os.path.exists(dir):
             os.mkdir(dir)
-        print(dir)
         file_name = link.split('/')[-1]
         path = os.path.join(dir, file_name)
 

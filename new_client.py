@@ -5,14 +5,16 @@ from sys import stdin
 import threading
 #from concurrent.futures import ProcessPoolExecutor
 
-def handleConnection(URL):
-    #print(len(URL))
+lock = threading.Lock()
+
+def handleConnection(URL,lock):
+    lock.acquire()
+    print("Thread start processing on: " + URL)
     o = urllib.parse.urlsplit(URL)
     BUFSIZE = 1024
     HOST = o.netloc
     socket = setup_socket.create_socket(URL)
     client_type = setup_socket.get_client_type(URL)
-
     #single main page
     if (client_type == 1):
         request = o.path
@@ -21,6 +23,7 @@ def handleConnection(URL):
         socket.send(bytes(stri,"utf8"))
         print("For the link " + URL)
         download_option = input("What do you want to use (Content-length/ chunked): ")
+        if (len(download_option) > 0) : lock.release()
         data = b""
         data = socket.recv(BUFSIZE)
         if (download_option == "Content-length"):
@@ -37,6 +40,7 @@ def handleConnection(URL):
         socket.send(bytes(stri,"utf8"))
         print("For the link " + URL)
         download_option = input("What do you want to use (Content-length/ chunked): ")
+        if (len(download_option) > 0) : lock.release()
         data = b""
         data = socket.recv(BUFSIZE)
         if (download_option == "Content-length"):
@@ -48,32 +52,35 @@ def handleConnection(URL):
     #folder
 
     if (client_type == 3):
+        lock.release()
         file_links = get_file_links.get_file_links(URL)
         download_content_length.download_folder(file_links,socket,BUFSIZE,HOST)
         
 #MainProgram go here
-linkSet = set()
-for line in stdin:
-    lineLength = len(line)
-    if (lineLength == 1) : break
-    linkSet.add(line)
+if __name__ == '__main__':
+    #Please input the desired download link in the download_link.txt file
+    linkSet = set()
 
-linkList = list(linkSet)
-ListSize = len(linkList)
-# for i in range(ListSize):
-#     tempLink = linkList[i]
-#     linkList[i] = tempLink[:-1]
+    myfile = open("download_link.txt", "r")
+    while myfile:
+        line  = myfile.readline()
+        if line == "": break
+        if (ord(line[-1]) == 10) : 
+            lineFixed = line[:-1]
+            linkSet.add(lineFixed)
+        else :
+            linkSet.add(line)
+    myfile.close() 
+    linkList = list(linkSet)
+    #print(len(linkList))
+    
 
 #Threading
 threadList = []
+lock = threading.Lock()
 for link in linkList:
-    serverThread = threading.Thread(target=handleConnection, args=(link[:-1],))
+    serverThread = threading.Thread(target=handleConnection, args=(link,lock,))
     threadList.append(serverThread)
     serverThread.start()
-
 [x.join() for x in threadList]
 
-
-#Processing
-# with ProcessPoolExecutor() as exe:
-#     exe.map(handleConnection, linkList)
