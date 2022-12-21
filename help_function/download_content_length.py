@@ -90,7 +90,7 @@ def download_folder(links, s, BUFSIZE, HOST):
         file_name = link.split('/')[-1]
         path = os.path.join(dir, file_name)
 
-        stri = f"GET {urllib.parse.urlsplit(link).path} HTTP/1.1\r\nHost: {HOST}\r\n\r\n"
+        stri = f"GET {urllib.parse.urlsplit(link).path} HTTP/1.1\r\nHost: {HOST}\r\nConnection: keep-alive\r\n\r\n"
 
         s.sendall(bytes(stri, "utf-8"))
         data = s.recv(BUFSIZE)

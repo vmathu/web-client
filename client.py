@@ -18,7 +18,7 @@ def handleConnection(URL, lock):
     if (client_type == 1):
         request = o.path
         file_name = "index.html"
-        stri = f"GET {request} HTTP/1.1\r\nHost: {HOST}\r\n\r\n"
+        stri = f"GET {request} HTTP/1.1\r\nHost: {HOST}\r\nConnection: keep-alive\r\n\r\n"
         socket.send(bytes(stri, "utf8"))
         print("For the link " + URL)
         download_option = input(
@@ -40,7 +40,7 @@ def handleConnection(URL, lock):
     if (client_type == 2):
         request = o.path
         tmp, file_name = o.path.rsplit("/", 1)
-        stri = f"GET {request} HTTP/1.1\r\nHost: {HOST}\r\n\r\n"
+        stri = f"GET {request} HTTP/1.1\r\nHost: {HOST}\r\nConnection: keep-alive\r\n\r\n"
         socket.send(bytes(stri, "utf8"))
         print("For the link " + URL)
         download_option = input(
