@@ -38,7 +38,7 @@ def download_content_length(headers, BUFSIZE, data, s, file_name):
             break
         else:
             file += data
-            if l_content <= 0:
+            if l_content < 0:
                 break
 
     # Look for the end of the header
@@ -82,7 +82,6 @@ def download_content_length_folder(headers, BUFSIZE, data, s, path):
 
 
 def download_folder(links, s, BUFSIZE, HOST):
-    thread_list = []
     for link in links:
         dir = os.path.join(os.getcwd(), link.split('/')[-2])
         if not os.path.exists(dir):
