@@ -1,7 +1,7 @@
 def download_chunked(data, s, BUFSIZE, file_name):
-    chunks = []
+    chunks = b""
     if data:
-        chunks.append(data)
+        chunks+=data
 
     while True:
         try:
@@ -12,13 +12,14 @@ def download_chunked(data, s, BUFSIZE, file_name):
             if not data:
                 # Client is done with sending.
                 break
-            chunks.append(data)
+            chunks+=data
 
-    file = open(file_name, "wb")
-    for chunk in chunks:
-        pos = chunk.find(b"\r\n\r\n")
-        if pos != -1:
-            chunk = chunk[pos+4:]
-        file.write(chunk)
-    file.close()
+    # Look for the end of the header
+    pos = chunks.find(b"\r\n\r\n")
+
+    # Skip past the header and save file data
+    file = chunks[pos+4:]
+    fwrite = open(file_name, "wb")
+    fwrite.write(file)
+    fwrite.close()
     s.close()

@@ -54,14 +54,14 @@ def download_content_length(headers, BUFSIZE, data, s, file_name):
 # Content-length but for folder
 
 
-def download_content_length_folder(headers, BUFSIZE, data, s, path):
+def download_content_length_folder(headers, BUFSIZE, data, s, path, l_header):
     if "Content-Length" in headers:
-        l_content = int(headers['Content-Length'])
+        l_content = int(headers['Content-Length']) + l_header
     else:
-        l_content = len(data)
+        l_content = len(data) + l_header
     file = b""
     if data:
-        file = data
+        file += data
         l_content -= len(data)
 
     while (l_content > 0):
@@ -93,8 +93,12 @@ def download_folder(links, s, BUFSIZE, HOST):
 
         s.sendall(bytes(stri, "utf-8"))
         data = s.recv(BUFSIZE)
+        pos = data.find(b"\r\n\r\n")
+        tmp_data = data[:pos+4]
+        l_header = len(tmp_data)
         status, headers = dict_headers(
             io.StringIO(data.decode(encoding="ISO-8859-1")))
-        download_content_length_folder(headers, BUFSIZE, data, s, path)
+        download_content_length_folder(
+            headers, BUFSIZE, data, s, path, l_header)
 
     s.close()
